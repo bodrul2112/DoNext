@@ -43,7 +43,7 @@ define(["thirdparty/jquery",
         	{
         		var data = mData[id];
         		
-        		var oTodoItem = new TodoItem( data.description, data.started, data.priority, data.state, sColor );
+        		var oTodoItem = new TodoItem( data.description, data.started, data.priority, data.state, data.percentage, sColor );
         		if(data.state == "active")
         		{
         			this.m_pActiveItems.push(oTodoItem);

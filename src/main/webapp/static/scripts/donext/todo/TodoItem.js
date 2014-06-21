@@ -1,9 +1,10 @@
 
 define(["thirdparty/jquery", "services/TemplateService"], function( jQuery, tpl) {
 
-        var TodoItem = function( sDescription, sStarted, sPriority, sState, sColor)
+        var TodoItem = function( sDescription, sStarted, sPriority, sState, nPercentage, sColor)
         {
         	this.m_eElement = tpl.getTemplate(".todo_item");
+        	this.m_nPercentage = nPercentage;
         	
         	this.m_sDescription = sDescription;
         	this.m_bStarted = (sStarted != "no");
@@ -17,8 +18,15 @@ define(["thirdparty/jquery", "services/TemplateService"], function( jQuery, tpl)
         	this.m_sPriority = sPriority;
         	this.m_sState = sState;
         	
+        	this.m_sColor = sColor;
+        	
         	this.m_eElement.find(".description").text( this.m_sDescription );
-        	this.m_eElement.css("background-color", sColor);
+        	this.m_eElement.find(".percentage").css("background-color", sColor);
+        	this.m_eElement.find(".description").css("color", sColor);
+        	this.m_eElement.find(".activate").css("background-color", sColor);
+        	this.m_eElement.find(".deactivate").css("background-color", sColor);
+        	
+        	this.m_eElement.find(".percentage .bar").css("width", nPercentage+"%");
         	
         	this.setPriority(sPriority);
         	this.setState(sState);
@@ -80,26 +88,32 @@ define(["thirdparty/jquery", "services/TemplateService"], function( jQuery, tpl)
         TodoItem.prototype.setPriority = function( sPriority )
         {
         	this.m_sPriority = sPriority;
-        	this.switcheroo(this.m_sPriority, "immediate", ".immediate", ".whenever", "selected");
+        	this.switcheroo(this.m_sPriority, "immediate", ".immediate", ".whenever", "selected", this.m_sColor);
         }
         
         TodoItem.prototype.setState = function( sState )
         {
         	this.m_sState = sState;
-        	this.switcheroo(this.m_sState, "inactive", ".activate", ".deactivate", "selected");
-        	this.switcheroo(this.m_sState, "inactive", ".deactivate", ".activate", "no_state");
+        	this.switcheroo(this.m_sState, "inactive", ".activate", ".deactivate", "selected", "white");
+        	this.switcheroo(this.m_sState, "inactive", ".deactivate", ".activate", "no_state", "white");
         }
         
         // i do this a lot...
-        TodoItem.prototype.switcheroo = function( sString, sPivot, sAdd, sRemove, sClass )
+        TodoItem.prototype.switcheroo = function( sString, sPivot, sAdd, sRemove, sClass, sColor)
         {
         	if(sString == sPivot)
         	{
+        		this.m_eElement.find( sAdd ).css("color", sColor );
+        		this.m_eElement.find( sRemove ).css("color", "white" );
+        		
         		this.m_eElement.find( sAdd ).addClass( sClass );
         		this.m_eElement.find( sRemove ).removeClass( sClass );
         	}
         	else
         	{
+        		this.m_eElement.find( sRemove ).css("color", sColor );
+        		this.m_eElement.find( sAdd ).css("color", "white" );
+        		
         		this.m_eElement.find( sRemove ).addClass( sClass );
         		this.m_eElement.find( sAdd ).removeClass( sClass );
         	}

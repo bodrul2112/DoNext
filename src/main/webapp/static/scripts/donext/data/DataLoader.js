@@ -8,14 +8,14 @@ define(["thirdparty/jquery"], function(jQuery) {
         			"id_1" : {
         				
         				name: "Books",
-        				color: "rgb(192,0,0)",
+        				color: "rgb(26, 173, 255)",
         				position: "1"
         			},
         			
         			"id_2" : {
         				
         				name: "Games",
-        				color: "rgb(139, 30, 117)",
+        				color: "rgb(255, 26, 62)",
         				position: "2"
         			}
         			
@@ -30,7 +30,8 @@ define(["thirdparty/jquery"], function(jQuery) {
             				description: "Read 1",
             				started: 1403368999731,
             				priority: "asap",
-            				state: "active"
+            				state: "active",
+            				percentage: Math.floor(Math.random()*100)
         				},
         				
         				"item2" : {
@@ -38,7 +39,8 @@ define(["thirdparty/jquery"], function(jQuery) {
             				description: "Read 2",
             				started: "no",
             				priority: "asap",
-            				state: "inactive"
+            				state: "inactive",
+            				percentage: Math.floor(Math.random()*100)
         				},
         				
         				"item3" : {
@@ -46,7 +48,8 @@ define(["thirdparty/jquery"], function(jQuery) {
             				description: "Read 3",
             				started: "no",
             				priority: "whenever",
-            				state: "inactive"
+            				state: "inactive",
+            				percentage: Math.floor(Math.random()*100)
         				},
         				
         				"item4" : {
@@ -54,7 +57,8 @@ define(["thirdparty/jquery"], function(jQuery) {
             				description: "Read 4",
             				started: 1403368763767,
             				priority: "whenever",
-            				state: "inactive"
+            				state: "inactive",
+            				percentage: Math.floor(Math.random()*100)
         				}
 
         			},
@@ -66,7 +70,8 @@ define(["thirdparty/jquery"], function(jQuery) {
             				description: "Play 1",
             				started: 1403368763767,
             				priority: "asap",
-            				state: "active"
+            				state: "active",
+            				percentage: Math.floor(Math.random()*100)
         				},
         			
 	    				"item101" : {
@@ -74,7 +79,8 @@ define(["thirdparty/jquery"], function(jQuery) {
 	        				description: "Play 2",
 	        				started: "no",
 	        				priority: "asap",
-	        				state: "inactive"
+	        				state: "inactive",
+            				percentage: Math.floor(Math.random()*100)
 	    				}
         			}
         			
