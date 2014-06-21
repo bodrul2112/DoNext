@@ -1,0 +1,86 @@
+
+.todo_list {
+	
+	float:left;
+	width:100%;
+	height:100%;
+}
+
+.todo_item .no_state {
+	display:none;
+}
+
+.todo_item .activate {
+	height: 22px;
+	width: 24px;
+}
+
+.activate.selected {
+	position: absolute;
+	margin-left: -24px;
+	line-height: 19px;
+	background-color: rgb(255, 26, 62);
+}
+
+.deactivate.selected {
+	
+}
+
+.todo_item .name_plate {
+	float:left;
+	height:100%;
+	width:100%;
+}
+
+.todo_item .priority {
+	
+	float: left;
+	width: 20%;
+	height: 17px;
+	overflow: hidden;
+}
+
+.priority .immediate, .priority .whenever {
+	float: left;
+	height: 17px;
+	overflow: hidden;
+	width:50%;
+	line-height: 18px;
+}
+
+.priority .immediate {
+}
+
+.priority .whenever {
+}
+
+.priority .selected {
+	background-color: rgb(255, 26, 62);
+}
+
+.todo_item .percentage {
+	float: left;
+	background-color: rgb(255, 26, 62);
+	overflow: hidden;
+	width:100%;
+	height:5px;
+}
+
+.todo_item .description {
+
+	float: left;
+	width: 80%;
+	height: 17px;
+	overflow: hidden;
+	line-height: 17px;
+}
+
+.todo_item {
+	float: left;
+	width: 80%;
+	height: 22px;
+	overflow: hidden;
+	color: white;
+	margin-top: 2px;
+	margin-left: 20%;
+}

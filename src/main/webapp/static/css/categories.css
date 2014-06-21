@@ -1,0 +1,17 @@
+
+
+.categories {
+	
+	float:left;
+	width:100%;
+	height: 35px;
+	border: 1px solid black;
+}
+
+.category {
+	
+	float:left;
+	width: 100px;
+	height: 100%;
+	border: 1px solid red;
+}
