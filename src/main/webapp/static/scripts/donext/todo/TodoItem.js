@@ -1,11 +1,14 @@
 
 define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub"], function( jQuery, tpl, EventHub) {
 
-        var TodoItem = function( sCategoryId, sDescription, sStarted, sPriority, sState, nPercentage, sColor)
+        var TodoItem = function( sCategoryId, sId, sDescription, sStarted, sPriority, sState, nPercentage, sColor)
         {
         	this.m_eElement = tpl.getTemplate(".todo_item");
+        	this.m_ePercentage = this.m_eElement.find(".percentage");
+        	this.m_ePercentageBar = this.m_eElement.find(".percentage .bar");
         	
         	this.m_sCategoryId = sCategoryId;
+        	this.m_sId = sId;
         	this.m_nPercentage = nPercentage;
         	
         	this.m_sDescription = sDescription;
@@ -33,27 +36,101 @@ define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub"]
         	
         	this.setPriority(sPriority);
         	this.setState(sState);
+        	
+        	this.m_bIsAdder = false;
+        	
+        	this.m_bDone = false;
+        }
+        
+        TodoItem.prototype.isAdder = function()
+        {
+        	return this.m_bIsAdder;
+        }
+        
+        TodoItem.prototype.isDone = function()
+        {
+        	return this.m_bDone;
+        }
+        
+        TodoItem.prototype.convertToNew = function()
+        {
+        	this.m_bIsAdder=true;
+        	
+        	this.m_eElement.find(".description").text("");
+        	this.m_eElement.find(".description").append(tpl.getTemplate(".todo_name"));
+        	
+        	this.m_eElement.find(".percentage").remove();
+        	this.m_eElement.find(".activate").remove();
+        	this.m_eElement.find(".deactivate").remove();
+        	
+        	this.m_eElement.find(".add").removeClass("no_state");
+        	this.m_eElement.find(".add").addClass("selected");
+    		this.m_eElement.find(".add").css("background-color", this.m_sColor);
         }
         
         TodoItem.prototype.postProcess = function()
         {
         	this.m_eElement.find(".immediate").on("click", function() {
         		this.setPriority("immediate");
+        		if(!this.m_bIsAdder){
+        			EventHub.triggerEvent("onRefresh", {});
+        		}
         	}.bind(this));
         	
         	this.m_eElement.find(".whenever").on("click", function() {
         		this.setPriority("whenever");
+        		if(!this.m_bIsAdder){
+        			EventHub.triggerEvent("onRefresh", {});
+        		}
         	}.bind(this));
         	
         	this.m_eElement.find(".activate").on("click", function() {
         		this.activate();
-        		// also move this one up
+        		EventHub.triggerEvent("onRefresh", {});
         	}.bind(this));
         	
         	this.m_eElement.find(".deactivate").on("click", function() {
         		this.deactivate();
-        		// also move this one down
+        		EventHub.triggerEvent("onRefresh", {});
         	}.bind(this));
+        	
+        	this.m_eElement.find(".add").on("click", function() {
+        		// do something
+        		
+        		var sDesc = this.m_eElement.find(".todo_name").val();
+        		var oDate = new Date();
+        		var id = "item_"+oDate.getTime();
+        		
+        		var mData = {
+        				item: new TodoItem(this.m_sCategoryId, id, sDesc, "no", this.m_sPriority, this.m_sState, 0, this.m_sColor)
+        		}
+        		
+        		EventHub.triggerEvent("onAddItem", mData);
+        		
+        	}.bind(this));
+        	
+        	this.m_eElement.find(".todo_done").on("click", function() {
+        		
+        		this.m_bDone = true;
+        		EventHub.triggerEvent("onRefresh", {});
+        		
+        	}.bind(this));
+        	
+        	this.m_eElement.find(".percentage").on("click", function(e) {
+        		this.setPercentageFromBar(e);
+        	}.bind(this));
+        }
+        
+        TodoItem.prototype.setPercentageFromBar = function(e)
+        {
+			var parentLeft = this.m_ePercentage.position().left;
+			var width = this.m_ePercentage.width();
+			
+			var relX = e.pageX - parentLeft;
+			this.m_nPercentage = Math.floor((relX/width)*100);
+
+			this.m_ePercentageBar.css("width", this.m_nPercentage+"%");
+			EventHub.triggerEvent("onRefresh", {});
         }
         
         TodoItem.prototype.getElement = function()
@@ -69,13 +146,11 @@ define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub"]
         	{
         		this.m_dStartDate = new Date();
         	}
-        	EventHub.triggerEvent("onRefresh", {});
         }
         
         TodoItem.prototype.deactivate = function()
         {
         	this.setState("inactive");
-        	EventHub.triggerEvent("onRefresh", {});
         }
         
         TodoItem.prototype.asJson = function()
@@ -119,7 +194,6 @@ define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub"]
         {
         	this.m_sPriority = sPriority;
         	this.switcheroo(this.m_sPriority, "immediate", ".immediate", ".whenever", "selected", this.m_sColor);
-        	EventHub.triggerEvent("onRefresh", {});
         }
         
         TodoItem.prototype.getState = function()

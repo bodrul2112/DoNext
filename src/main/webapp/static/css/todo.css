@@ -12,6 +12,10 @@
 	width:100%;
 }
 
+.todo_inactive .todo_done {
+	display:none;
+}
+
 .todo_list {
 	
 	float:left;
@@ -24,12 +28,23 @@
 }
 
 
-.todo_item .activate, .todo_item .deactivate {
+.todo_item .activate, .todo_item .deactivate, .todo_item .add, .todo_active .todo_done {
 	height: 22px;
 	width: 24px;
 }
 
-.activate.selected {
+.todo_active .todo_done {
+	
+	margin-left: 99%;
+	background-color: rgb(219, 219, 219);
+	position: absolute;
+	margin-top: -19px;
+	height: 22px;
+	color: white;
+	line-height: 21px;
+}
+
+.activate.selected, .add.selected {
 	position: absolute;
 	margin-left: -24px;
 	line-height: 19px;
@@ -42,6 +57,10 @@
 	position: absolute;
 	margin-left: 80%;
 }
+
+ .todo_item .add {
+ 
+ }
 
 .todo_item .name_plate {
 	float:left;

@@ -22,6 +22,7 @@ define(["thirdparty/jquery",
         	
         	EventHub.registerEvent("onCategoryLoaded", this.m_sCallbackId, this );
         	EventHub.registerEvent("onCategoryUnloaded", this.m_sCallbackId, this );
+        	EventHub.registerEvent("onAddItem", this.m_sCallbackId, this );
         	EventHub.registerEvent("onRefresh", this.m_sCallbackId, this );
         	
         	this.m_mLoadedCategories = {};
@@ -48,10 +49,35 @@ define(["thirdparty/jquery",
         	{
         		this.onCategoryUnloaded(mCallbackData);
         	}
+        	else if(sEventName == "onAddItem")
+        	{
+        		this.addSingleItem(mCallbackData.item);
+        	}
         	else if(sEventName == "onRefresh")
         	{
         		this.refresh();
         	}
+        }
+        
+        TodoList.prototype.isOnlyOneLoaded = function()
+        {
+        	var nLoaded=0;
+        	var result;
+        	for(var key in this.m_mLoadedCategories)
+        	{
+        		if(this.m_mLoadedCategories[key])
+        		{
+        			nLoaded++;
+        			result = {id:key, color:this.m_mLoadedCategories[key]};
+        		}
+        	}
+        	
+        	if(nLoaded==1){
+        		return result;
+        	}else{
+        		return false
+        	};
+        	
         }
         
         TodoList.prototype.onCategoryUnloaded = function( mCallbackData )
@@ -62,6 +88,7 @@ define(["thirdparty/jquery",
         	this.m_pActiveItems = this.removeElementsWithId(mCallbackData, this.m_pActiveItems);
         	this.m_pInactiveItems = this.removeElementsWithId(mCallbackData, this.m_pInactiveItems);
         	
+        	this.refresh();
         }
         
         TodoList.prototype.removeElementsWithId = function( mCallbackData, pItems )
@@ -73,7 +100,7 @@ define(["thirdparty/jquery",
         	{
         		var oTodoItem = pItems[key];
         		
-        		if(oTodoItem.getCategoryId() == sCategoryId)
+        		if(oTodoItem.getCategoryId() == sCategoryId || oTodoItem.isAdder())
         		{
         			oTodoItem.getElement().remove();
         		}
@@ -88,38 +115,39 @@ define(["thirdparty/jquery",
         
         TodoList.prototype.onCategoryLoaded = function( mCallbackData )
         {
-        	
         	var sCategoryId = mCallbackData.id;
         	var sColor = mCallbackData.color;
         	
-        	if(!this.m_mLoadedCategories[sCategoryId])
-        	{
-        		this.m_mLoadedCategories[sCategoryId]=true;
-        	}
-        	else
-        	{
+        	if(!this.m_mLoadedCategories[sCategoryId]) {
+        		this.m_mLoadedCategories[sCategoryId]=sColor; // dodgy stuffz, using the color as true, so i can use the color later
+        	}else{
         		return;
         	}
         	
         	var mData = DataLoader.loadToDos(mCallbackData.id);
-        	var pItems = [];
         	
         	for(var id in mData)
         	{
         		var data = mData[id];
         		
-        		var oTodoItem = new TodoItem( sCategoryId, data.description, data.started, data.priority, data.state, data.percentage, sColor );
+        		var oTodoItem = new TodoItem( sCategoryId, id, data.description, data.started, data.priority, data.state, data.percentage, sColor );
         		if(data.state == "active")
         		{
-        			pItems.push(oTodoItem);
+        			this.m_pActiveItems.push(oTodoItem);
         		}
         		else
         		{
-        			pItems.push(oTodoItem);
+        			this.m_pInactiveItems.push(oTodoItem);
         		}
         	}
         	
-        	this.addItemsToLists(pItems);
+        	this.refresh();
+        }
+        
+        TodoList.prototype.addSingleItem = function( oTodoItem )
+        {
+        	this.m_pInactiveItems.push(oTodoItem);
+        	this.refresh();
         }
         
         TodoList.prototype.addItemsToLists = function( pItems )
@@ -127,7 +155,13 @@ define(["thirdparty/jquery",
         	for(var key in pItems)
         	{
         		var oTodoItem = pItems[key];
-        		if(oTodoItem.getState() == "active")
+        		
+        		if(oTodoItem.isAdder())
+        		{
+        			// lose it
+        			oTodoItem.getElement().remove();
+        		}
+        		else if(oTodoItem.getState() == "active")
         		{
         			this.m_pActiveItems.push(oTodoItem);
         		}
@@ -138,10 +172,21 @@ define(["thirdparty/jquery",
         	}
         	
         	this.m_pActiveItems.sort(this.sort);
-        	this.m_oUICleaner.removeElements( this.m_pActiveItems );
+        	this.m_oUICleaner.removeElements( pItems );
         	this.m_oUICleaner.addElements(this.m_eActive, this.m_pActiveItems );
         	
         	this.m_pInactiveItems.sort(this.sort);
+        	
+        	var mProps = this.isOnlyOneLoaded();
+        	
+        	if(mProps)
+        	{
+        		console.log("does this ever get called? - good idea to add one")
+        		var oTodoAdder = new TodoItem(mProps.id, -1, "", "no", "whenever", "inactive", 0, mProps.color);
+        		oTodoAdder.convertToNew();
+        		this.m_pInactiveItems.push(oTodoAdder);
+        	}
+        	
         	this.m_oUICleaner.removeElements( this.m_pInactiveItems );
         	this.m_oUICleaner.addElements(this.m_eInactive, this.m_pInactiveItems );
         }
@@ -152,12 +197,27 @@ define(["thirdparty/jquery",
         	
         	for(var key in this.m_pActiveItems)
         	{
-        		pItems.push( this.m_pActiveItems[key] );
+        		if(!this.m_pActiveItems[key].isDone())
+    			{
+        			pItems.push( this.m_pActiveItems[key] );
+    			}
+        		else
+        		{
+        			console.log("its done")
+        			this.m_pActiveItems[key].getElement().remove();
+        		}
         	}
         	
         	for(var key in this.m_pInactiveItems)
         	{
-        		pItems.push( this.m_pInactiveItems[key] );
+        		if(!this.m_pInactiveItems[key].isAdder())
+        		{
+        			pItems.push( this.m_pInactiveItems[key] );
+        		}
+        		else
+        		{
+        			this.m_pInactiveItems[key].getElement().remove();
+        		}
         	}
         	
         	this.m_pActiveItems = [];
