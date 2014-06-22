@@ -1,9 +1,11 @@
 
 define(["thirdparty/jquery", "services/TemplateService"], function( jQuery, tpl) {
 
-        var TodoItem = function( sDescription, sStarted, sPriority, sState, nPercentage, sColor)
+        var TodoItem = function( sCategoryId, sDescription, sStarted, sPriority, sState, nPercentage, sColor)
         {
         	this.m_eElement = tpl.getTemplate(".todo_item");
+        	
+        	this.m_sCategoryId = sCategoryId;
         	this.m_nPercentage = nPercentage;
         	
         	this.m_sDescription = sDescription;
@@ -21,8 +23,9 @@ define(["thirdparty/jquery", "services/TemplateService"], function( jQuery, tpl)
         	this.m_sColor = sColor;
         	
         	this.m_eElement.find(".description").text( this.m_sDescription );
-        	this.m_eElement.find(".percentage").css("background-color", sColor);
         	this.m_eElement.find(".description").css("color", sColor);
+        	
+        	this.m_eElement.find(".percentage").css("background-color", sColor);
         	this.m_eElement.find(".activate").css("background-color", sColor);
         	this.m_eElement.find(".deactivate").css("background-color", sColor);
         	
@@ -83,6 +86,31 @@ define(["thirdparty/jquery", "services/TemplateService"], function( jQuery, tpl)
         	}
         	
         	return mJsonMap;
+        }
+        
+        TodoItem.prototype.getCategoryId = function()
+        {
+        	return this.m_sCategoryId;
+        }
+        
+        TodoItem.prototype.isStarted = function()
+        {
+        	return this.m_bStarted;
+        }
+        
+        TodoItem.prototype.getStartDate = function()
+        {
+        	return this.m_dStartDate;
+        }
+        
+        TodoItem.prototype.getPriority = function()
+        {
+        	return this.m_sPriority;
+        }
+        
+        TodoItem.prototype.getPercentage = function()
+        {
+        	return this.m_nPercentage;
         }
         
         TodoItem.prototype.setPriority = function( sPriority )

@@ -12,6 +12,8 @@ define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub" 
         	this.m_eElement = tpl.getTemplate(".category");
         	
         	this.m_eElement.text( this.m_sName );
+        	
+        	this.m_bLoaded = false;
         }
         
         Category.prototype.getElement = function()
@@ -28,17 +30,31 @@ define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub" 
         {
         	this.m_eElement.on("click", function() {
 
-        		this.m_eElement.css("background-color", this.m_sColor);
-        		
-        		// load the item
-        		console.log("clicked category : " + this.m_sName);
-        		
-        		var mData = {
-        			id:this.m_sId,
-        			color:this.m_sColor
-        		};
-        		
-        		EventHub.triggerEvent("onCategoryClicked", mData);
+        		if(!this.m_bLoaded)
+        		{
+        			this.m_bLoaded = true;
+            		this.m_eElement.css("background-color", this.m_sColor);
+            		
+            		// load the item
+            		console.log("clicked category : " + this.m_sName);
+            		
+            		var mData = {
+            			id:this.m_sId,
+            			color:this.m_sColor
+            		};
+            		
+            		EventHub.triggerEvent("onCategoryLoaded", mData);
+        		}
+        		else
+        		{
+        			this.m_eElement.css("background-color", "");
+        			var mData = {
+                			id:this.m_sId
+                		};
+                		
+                	EventHub.triggerEvent("onCategoryUnloaded", mData);
+                	this.m_bLoaded = false;
+        		}
         		
         	}.bind(this));
         	

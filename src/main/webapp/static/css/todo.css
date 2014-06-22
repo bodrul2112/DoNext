@@ -1,4 +1,17 @@
 
+
+.todo_active {
+	float:left;
+	width:100%;
+	margin-top: 20px;
+	margin-bottom: 25px;
+}
+
+.todo_inactive {
+	float:left;
+	width:100%;
+}
+
 .todo_list {
 	
 	float:left;
@@ -11,7 +24,7 @@
 }
 
 
-.todo_item .activate {
+.todo_item .activate, .todo_item .deactivate {
 	height: 22px;
 	width: 24px;
 }
@@ -24,7 +37,10 @@
 }
 
 .deactivate.selected {
-	
+	line-height: 19px;
+	background-color: inherit;
+	position: absolute;
+	margin-left: 80%;
 }
 
 .todo_item .name_plate {
@@ -93,3 +109,10 @@
 	margin-left: 20%;
 	background-color: #ECECEC;
 }
+
+
+.todo_active .todo_item {
+	margin-left:0%;
+}
+
+

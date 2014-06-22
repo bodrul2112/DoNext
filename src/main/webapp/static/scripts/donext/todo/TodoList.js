@@ -20,7 +20,10 @@ define(["thirdparty/jquery",
         	
         	this.m_sCallbackId = "TodoList";
         	
-        	EventHub.registerEvent("onCategoryClicked", this.m_sCallbackId, this );
+        	EventHub.registerEvent("onCategoryLoaded", this.m_sCallbackId, this );
+        	EventHub.registerEvent("onCategoryUnloaded", this.m_sCallbackId, this );
+        	
+        	this.m_mLoadedCategories = {};
         }
         
         TodoList.prototype.getElement = function()
@@ -36,14 +39,70 @@ define(["thirdparty/jquery",
         
         TodoList.prototype.onEvent = function( sEventName, mCallbackData )
         {
-        	var mData = DataLoader.loadToDos(mCallbackData.id);
+        	if(sEventName == "onCategoryLoaded")
+        	{
+        		this.onCategoryLoaded(mCallbackData);
+        	}
+        	else if(sEventName == "onCategoryUnloaded")
+        	{
+        		this.onCategoryUnloaded(mCallbackData);
+        	}
+        }
+        
+        TodoList.prototype.onCategoryUnloaded = function( mCallbackData )
+        {
+        	var sCategoryId = mCallbackData.id;
+        	this.m_mLoadedCategories[sCategoryId]=false;
+        	
+        	this.m_pActiveItems = this.removeElementsWithId(mCallbackData, this.m_pActiveItems);
+        	this.m_pInactiveItems = this.removeElementsWithId(mCallbackData, this.m_pInactiveItems);
+        	
+        }
+        
+        TodoList.prototype.removeElementsWithId = function( mCallbackData, pItems )
+        {
+        	var sCategoryId = mCallbackData.id;
+        	var pNewActiveItems = [];
+        	
+        	for(var key in pItems)
+        	{
+        		var oTodoItem = pItems[key];
+        		
+        		if(oTodoItem.getCategoryId() == sCategoryId)
+        		{
+        			oTodoItem.getElement().remove();
+        		}
+        		else
+        		{
+        			pNewActiveItems.push(oTodoItem);
+        		}
+        	}
+        	
+        	return pNewActiveItems;
+        }
+        
+        TodoList.prototype.onCategoryLoaded = function( mCallbackData )
+        {
+        	
+        	var sCategoryId = mCallbackData.id;
         	var sColor = mCallbackData.color;
+        	
+        	if(!this.m_mLoadedCategories[sCategoryId])
+        	{
+        		this.m_mLoadedCategories[sCategoryId]=true;
+        	}
+        	else
+        	{
+        		return;
+        	}
+        	
+        	var mData = DataLoader.loadToDos(mCallbackData.id);
         	
         	for(var id in mData)
         	{
         		var data = mData[id];
         		
-        		var oTodoItem = new TodoItem( data.description, data.started, data.priority, data.state, data.percentage, sColor );
+        		var oTodoItem = new TodoItem( sCategoryId, data.description, data.started, data.priority, data.state, data.percentage, sColor );
         		if(data.state == "active")
         		{
         			this.m_pActiveItems.push(oTodoItem);
@@ -54,8 +113,32 @@ define(["thirdparty/jquery",
         		}
         	}
         	
+        	
+        	this.m_pActiveItems.sort(this.sort);
+        	this.m_oUICleaner.removeElements( this.m_pActiveItems );
+        	this.m_oUICleaner.addElements(this.m_eActive, this.m_pActiveItems );
+        	
+        	this.m_pInactiveItems.sort(this.sort);
+        	this.m_oUICleaner.removeElements( this.m_pInactiveItems );
         	this.m_oUICleaner.addElements(this.m_eInactive, this.m_pInactiveItems );
         	
+        }
+        
+        TodoList.prototype.sort = function( oTodoItemA, oTodoItemB)
+        {
+        	if(  oTodoItemA.getPriority() < oTodoItemB.getPriority() )
+        	{
+        		return -1;
+        	}
+        	else if(  oTodoItemA.getPriority() > oTodoItemB.getPriority() )
+        	{
+        		return 1;
+        	}
+        	else
+        	{
+        		var n = -( oTodoItemA.getPercentage() - oTodoItemB.getPercentage() );
+        		return n;
+        	}
         }
         
         return TodoList;

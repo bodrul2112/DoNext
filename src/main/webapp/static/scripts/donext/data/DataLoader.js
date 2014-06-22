@@ -38,7 +38,7 @@ define(["thirdparty/jquery"], function(jQuery) {
         					
             				description: "Read 2",
             				started: "no",
-            				priority: "asap",
+            				priority: "immediate",
             				state: "inactive",
             				percentage: Math.floor(Math.random()*100)
         				},
@@ -59,6 +59,33 @@ define(["thirdparty/jquery"], function(jQuery) {
             				priority: "whenever",
             				state: "inactive",
             				percentage: Math.floor(Math.random()*100)
+        				},
+        				
+        				"item5" : {
+        					
+            				description: "Read 5",
+            				started: 1403368763767,
+            				priority: "whenever",
+            				state: "inactive",
+            				percentage: Math.floor(Math.random()*100)
+        				},
+        				
+        				"item6" : {
+        					
+            				description: "Read 6",
+            				started: 1403368763767,
+            				priority: "immediate",
+            				state: "inactive",
+            				percentage: Math.floor(Math.random()*100)
+        				},
+        				
+        				"item7" : {
+        					
+            				description: "Read 7",
+            				started: 1403368763767,
+            				priority: "whenever",
+            				state: "inactive",
+            				percentage: Math.floor(Math.random()*100)
         				}
 
         			},
@@ -69,7 +96,7 @@ define(["thirdparty/jquery"], function(jQuery) {
         					
             				description: "Play 1",
             				started: 1403368763767,
-            				priority: "asap",
+            				priority: "whenever",
             				state: "active",
             				percentage: Math.floor(Math.random()*100)
         				},
@@ -78,7 +105,7 @@ define(["thirdparty/jquery"], function(jQuery) {
 	    					
 	        				description: "Play 2",
 	        				started: "no",
-	        				priority: "asap",
+	        				priority: "whenever",
 	        				state: "inactive",
             				percentage: Math.floor(Math.random()*100)
 	    				}

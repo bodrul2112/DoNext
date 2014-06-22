@@ -26,7 +26,7 @@ html,body {
 	text-align: center;
 	line-height: 33px;
 	
-	overflow:hidden;
+	overflow-x:hidden;
     
     background: #ffffff; /* Old browsers */
 	background: -moz-linear-gradient(top,  #ffffff 0%, #f3f3f3 50%, #ededed 51%, #ffffff 100%); /* FF3.6+ */
@@ -36,8 +36,16 @@ html,body {
 	background: -ms-linear-gradient(top,  #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%); /* IE10+ */
 	background: linear-gradient(to bottom,  #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
-
+	
+	
 }
+
+.main_wrapper::-webkit-scrollbar {
+	width: 4px;
+	height: 10px;
+}
+
+
 
 .templates {
 	display:none;
