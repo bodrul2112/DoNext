@@ -35,9 +35,6 @@ define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub" 
         			this.m_bLoaded = true;
             		this.m_eElement.css("background-color", this.m_sColor);
             		
-            		// load the item
-            		console.log("clicked category : " + this.m_sName);
-            		
             		var mData = {
             			id:this.m_sId,
             			color:this.m_sColor

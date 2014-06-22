@@ -22,6 +22,7 @@ define(["thirdparty/jquery",
         	
         	EventHub.registerEvent("onCategoryLoaded", this.m_sCallbackId, this );
         	EventHub.registerEvent("onCategoryUnloaded", this.m_sCallbackId, this );
+        	EventHub.registerEvent("onRefresh", this.m_sCallbackId, this );
         	
         	this.m_mLoadedCategories = {};
         }
@@ -46,6 +47,10 @@ define(["thirdparty/jquery",
         	else if(sEventName == "onCategoryUnloaded")
         	{
         		this.onCategoryUnloaded(mCallbackData);
+        	}
+        	else if(sEventName == "onRefresh")
+        	{
+        		this.refresh();
         	}
         }
         
@@ -97,6 +102,7 @@ define(["thirdparty/jquery",
         	}
         	
         	var mData = DataLoader.loadToDos(mCallbackData.id);
+        	var pItems = [];
         	
         	for(var id in mData)
         	{
@@ -104,6 +110,24 @@ define(["thirdparty/jquery",
         		
         		var oTodoItem = new TodoItem( sCategoryId, data.description, data.started, data.priority, data.state, data.percentage, sColor );
         		if(data.state == "active")
+        		{
+        			pItems.push(oTodoItem);
+        		}
+        		else
+        		{
+        			pItems.push(oTodoItem);
+        		}
+        	}
+        	
+        	this.addItemsToLists(pItems);
+        }
+        
+        TodoList.prototype.addItemsToLists = function( pItems )
+        {
+        	for(var key in pItems)
+        	{
+        		var oTodoItem = pItems[key];
+        		if(oTodoItem.getState() == "active")
         		{
         			this.m_pActiveItems.push(oTodoItem);
         		}
@@ -113,7 +137,6 @@ define(["thirdparty/jquery",
         		}
         	}
         	
-        	
         	this.m_pActiveItems.sort(this.sort);
         	this.m_oUICleaner.removeElements( this.m_pActiveItems );
         	this.m_oUICleaner.addElements(this.m_eActive, this.m_pActiveItems );
@@ -121,7 +144,25 @@ define(["thirdparty/jquery",
         	this.m_pInactiveItems.sort(this.sort);
         	this.m_oUICleaner.removeElements( this.m_pInactiveItems );
         	this.m_oUICleaner.addElements(this.m_eInactive, this.m_pInactiveItems );
+        }
+        
+        TodoList.prototype.refresh = function()
+        {
+        	var pItems = [];
         	
+        	for(var key in this.m_pActiveItems)
+        	{
+        		pItems.push( this.m_pActiveItems[key] );
+        	}
+        	
+        	for(var key in this.m_pInactiveItems)
+        	{
+        		pItems.push( this.m_pInactiveItems[key] );
+        	}
+        	
+        	this.m_pActiveItems = [];
+        	this.m_pInactiveItems = [];
+        	this.addItemsToLists(pItems);
         }
         
         TodoList.prototype.sort = function( oTodoItemA, oTodoItemB)

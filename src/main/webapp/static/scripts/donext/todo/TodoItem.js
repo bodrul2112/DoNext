@@ -1,5 +1,5 @@
 
-define(["thirdparty/jquery", "services/TemplateService"], function( jQuery, tpl) {
+define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub"], function( jQuery, tpl, EventHub) {
 
         var TodoItem = function( sCategoryId, sDescription, sStarted, sPriority, sState, nPercentage, sColor)
         {
@@ -63,17 +63,19 @@ define(["thirdparty/jquery", "services/TemplateService"], function( jQuery, tpl)
         
         TodoItem.prototype.activate = function()
         {
-        	this.m_sState = "active";
+        	this.setState("active");
         	
         	if(!this.m_dStartDate)
         	{
         		this.m_dStartDate = new Date();
         	}
+        	EventHub.triggerEvent("onRefresh", {});
         }
         
         TodoItem.prototype.deactivate = function()
         {
-        	this.m_sState = "inactive";
+        	this.setState("inactive");
+        	EventHub.triggerEvent("onRefresh", {});
         }
         
         TodoItem.prototype.asJson = function()
@@ -117,6 +119,12 @@ define(["thirdparty/jquery", "services/TemplateService"], function( jQuery, tpl)
         {
         	this.m_sPriority = sPriority;
         	this.switcheroo(this.m_sPriority, "immediate", ".immediate", ".whenever", "selected", this.m_sColor);
+        	EventHub.triggerEvent("onRefresh", {});
+        }
+        
+        TodoItem.prototype.getState = function()
+        {
+        	return this.m_sState;
         }
         
         TodoItem.prototype.setState = function( sState )

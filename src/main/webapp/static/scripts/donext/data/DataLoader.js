@@ -29,7 +29,7 @@ define(["thirdparty/jquery"], function(jQuery) {
         					
             				description: "Read 1",
             				started: 1403368999731,
-            				priority: "asap",
+            				priority: "immediate",
             				state: "active",
             				percentage: Math.floor(Math.random()*100)
         				},
