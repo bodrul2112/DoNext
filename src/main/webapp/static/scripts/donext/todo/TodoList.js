@@ -24,8 +24,12 @@ define(["thirdparty/jquery",
         	EventHub.registerEvent("onCategoryUnloaded", this.m_sCallbackId, this );
         	EventHub.registerEvent("onAddItem", this.m_sCallbackId, this );
         	EventHub.registerEvent("onRefresh", this.m_sCallbackId, this );
+        	EventHub.registerEvent("onTodosLoaded", this.m_sCallbackId, this );
         	
         	this.m_mLoadedCategories = {};
+        	
+        	
+        	this.temp = {};
         }
         
         TodoList.prototype.getElement = function()
@@ -52,6 +56,10 @@ define(["thirdparty/jquery",
         	else if(sEventName == "onAddItem")
         	{
         		this.addSingleItem(mCallbackData.item);
+        	}
+        	else if(sEventName == "onTodosLoaded")
+        	{
+        		this.onTodosLoaded(mCallbackData);
         	}
         	else if(sEventName == "onRefresh")
         	{
@@ -124,7 +132,16 @@ define(["thirdparty/jquery",
         		return;
         	}
         	
-        	var mData = DataLoader.loadToDos(mCallbackData.id);
+        	this.temp = mCallbackData;
+        	
+        	DataLoader.loadToDos(mCallbackData.id);
+
+        }
+        
+        TodoList.prototype.onTodosLoaded = function( mData )
+        {
+        	var sCategoryId = this.temp.id;
+        	var sColor = this.temp.color;
         	
         	for(var id in mData)
         	{
@@ -142,6 +159,8 @@ define(["thirdparty/jquery",
         	}
         	
         	this.refresh();
+        	
+        	this.temp={};
         }
         
         TodoList.prototype.addSingleItem = function( oTodoItem )

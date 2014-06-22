@@ -4,7 +4,8 @@ define(["thirdparty/jquery",
         "services/TemplateService", 
         "donext/util/UICleaner",
         "donext/data/DataLoader",
-        "donext/category/Category"], function( jQuery, tpl, UICleaner, DataLoader, Category ) {
+        "donext/category/Category",
+        "donext/util/EventHub"], function( jQuery, tpl, UICleaner, DataLoader, Category, EventHub ) {
 
         var Categories = function( )
         {
@@ -13,6 +14,11 @@ define(["thirdparty/jquery",
         	this.m_oUICleaner = new UICleaner();
         	
         	this.m_pCategories = [];
+        	
+        	this.m_sCallbackId = "CATEG_1234"
+        	
+        	EventHub.registerEvent("onCategoriesLoaded", this.m_sCallbackId, this );
+        	
         }
         
         Categories.prototype.getElement = function()
@@ -22,8 +28,11 @@ define(["thirdparty/jquery",
         
         Categories.prototype.loadData = function()
         {
-        	var mData = DataLoader.loadCategories();
-        	
+        	DataLoader.loadCategories();
+        }
+        
+        Categories.prototype.onEvent = function( sEventName, mData )
+        {
         	for(var id in mData)
         	{
         		var oData = mData[id];

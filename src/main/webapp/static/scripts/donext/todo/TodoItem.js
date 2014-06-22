@@ -1,5 +1,8 @@
 
-define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub"], function( jQuery, tpl, EventHub) {
+define(["thirdparty/jquery", 
+        "services/TemplateService", 
+        "donext/util/EventHub",
+        "donext/data/DataLoader" ], function( jQuery, tpl, EventHub, DataLoader) {
 
         var TodoItem = function( sCategoryId, sId, sDescription, sStarted, sPriority, sState, nPercentage, sColor)
         {
@@ -9,6 +12,7 @@ define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub"]
         	
         	this.m_sCategoryId = sCategoryId;
         	this.m_sId = sId;
+        	
         	this.m_nPercentage = nPercentage;
         	
         	this.m_sDescription = sDescription;
@@ -75,6 +79,7 @@ define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub"]
         		if(!this.m_bIsAdder){
         			EventHub.triggerEvent("onRefresh", {});
         		}
+        		DataLoader.save(this.asJson());
         	}.bind(this));
         	
         	this.m_eElement.find(".whenever").on("click", function() {
@@ -82,16 +87,19 @@ define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub"]
         		if(!this.m_bIsAdder){
         			EventHub.triggerEvent("onRefresh", {});
         		}
+        		DataLoader.save(this.asJson());
         	}.bind(this));
         	
         	this.m_eElement.find(".activate").on("click", function() {
         		this.activate();
         		EventHub.triggerEvent("onRefresh", {});
+        		DataLoader.save(this.asJson());
         	}.bind(this));
         	
         	this.m_eElement.find(".deactivate").on("click", function() {
         		this.deactivate();
         		EventHub.triggerEvent("onRefresh", {});
+        		DataLoader.save(this.asJson());
         	}.bind(this));
         	
         	this.m_eElement.find(".add").on("click", function() {
@@ -101,11 +109,15 @@ define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub"]
         		var oDate = new Date();
         		var id = "item_"+oDate.getTime();
         		
+        		var oTodoItem = new TodoItem(this.m_sCategoryId, id, sDesc, "no", this.m_sPriority, this.m_sState, 0, this.m_sColor);
+        		
         		var mData = {
-        				item: new TodoItem(this.m_sCategoryId, id, sDesc, "no", this.m_sPriority, this.m_sState, 0, this.m_sColor)
+        				item: oTodoItem
         		}
         		
         		EventHub.triggerEvent("onAddItem", mData);
+        		
+        		DataLoader.save(oTodoItem.asJson());
         		
         	}.bind(this));
         	
@@ -114,10 +126,13 @@ define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub"]
         		this.m_bDone = true;
         		EventHub.triggerEvent("onRefresh", {});
         		
+        		DataLoader.save(this.asJson());
+        		
         	}.bind(this));
         	
         	this.m_eElement.find(".percentage").on("click", function(e) {
         		this.setPercentageFromBar(e);
+        		DataLoader.save(this.asJson());
         	}.bind(this));
         }
         
@@ -155,14 +170,29 @@ define(["thirdparty/jquery", "services/TemplateService", "donext/util/EventHub"]
         
         TodoItem.prototype.asJson = function()
         {
-        	var mJsonMap = {
-				description: this.m_sDescription,
-				started: this.m_dStartDate.getTime(),
-				priority: this.m_sPriority,
-				state: this.m_sState
+        	
+        	var sStarted = "no";
+        	if(this.m_dStartDate)
+        	{
+        		sStarted = this.m_dStartDate.getTime();
         	}
         	
-        	return mJsonMap;
+        	var mJsonMap = {
+				description: this.m_sDescription,
+				started: sStarted,
+				priority: this.m_sPriority,
+				state: this.m_sState,
+				percentage: this.m_nPercentage,
+        	}
+        	
+        	var result = {
+        		filename: this.m_sCategoryId+"/"+this.m_sId+".txt",
+        		doneFilename: this.m_sCategoryId+"/done/"+this.m_sId+".txt",
+        		done: this.m_bDone,
+        		content: JSON.stringify(mJsonMap)
+        	}
+        	
+        	return result;
         }
         
         TodoItem.prototype.getCategoryId = function()
